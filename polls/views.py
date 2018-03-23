@@ -1,13 +1,29 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, Http404
+from .models import Question
+
+
+from django.template import loader
 
 def index(request):
-    return HttpResponse("Hello Handsome ole you")
+
+    ques_list = Question.objects.order_by('-pub_date')[:5]
+
+    context = {
+        'latest_question_list':
+            ques_list,
+    }
+    return HttpResponse(render(request, 'polls/index.html', context))
+
+
+
 
 # Display question text with no result but with a form to vote
-def detail(request, questino_id):
-    response = HttpResponse("You're looking at question %s" % questino_id)
-    return response
+def detail(request, question_id):
+
+    question = get_object_or_404(Question, pk=question_id)
+
+    return render(request, 'polls/detail.html',  {'question': question})
 
 # Results - display results for particular question
 def results(request, question_id):
